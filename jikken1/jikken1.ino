@@ -49,7 +49,10 @@ void setup() {
   isStarted=false;
 }
 void displayNumber(int num){
-  Serial.println(num);
+  lcd.clear();
+  lcd.print(num);
+  lcd.setCursor(3,0);
+  lcd.print("->");
 }
 
 void(* resetFunc) (void) = 0;
@@ -59,7 +62,6 @@ void prologue(){
   lcd.print("Game Start...");
   delay(1000);
   lcd.clear();
-  lcd.print("point : 0");
 }
 
 int generateRand(){
@@ -75,10 +77,6 @@ void pointAdder(){
   else{
     score += 100;
   }
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("point : ");
-  lcd.print(score);
 }
 
 void gameFin(){
@@ -89,6 +87,7 @@ void gameFin(){
   lcd.setCursor(0,1);
   lcd.print("check your score");
   delay(5000);
+  Serial.println(score);
 }
 void loop() {
   // put your main code here, to run repeatedly:
@@ -98,7 +97,6 @@ void loop() {
     displayNumber(perNum);
     isStarted = true;
   }
-
   if(digitalRead(buttonHigh) == LOW && digitalRead(buttonLow) == LOW && isStarted == true){
     resetFunc();
   }
@@ -109,6 +107,9 @@ void loop() {
       int nextNum = generateRand();
       if(nextNum >= perNum){
         pointAdder();
+        lcd.setCursor(1,1);
+        lcd.print("correct");
+        delay(1000);
         perNum = nextNum;
         displayNumber(perNum);
         delay(500);
@@ -124,6 +125,9 @@ void loop() {
       int nextNum = generateRand();
       if(nextNum < perNum){
         pointAdder();
+        lcd.setCursor(1,1);
+        lcd.print("correct");
+        delay(1000);
         perNum = nextNum;
         displayNumber(perNum);
         delay(500);
@@ -136,5 +140,3 @@ void loop() {
     }
   }
 }
-
-
