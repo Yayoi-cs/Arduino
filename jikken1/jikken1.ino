@@ -4,7 +4,7 @@
 //LEDsettings
 const int lED1 = 2;   // @***@
 const int lED2 = 13;  // *@*@*
-const int lED3 = 1;   // **@**
+const int lED3 = 3;   // **@**
 //LED settings
 const int rS = 10;
 const int rW = 11;
@@ -48,6 +48,9 @@ void setup() {
   lcd.print("High and Low");
   score = 0;
   isStarted = false;
+  digitalWrite(lED1, HIGH);
+  digitalWrite(lED2, HIGH);
+  digitalWrite(lED3, HIGH);
 }
 void displayNumber(int num) {
   lcd.clear();
@@ -61,7 +64,12 @@ void (*resetFunc)(void) = 0;
 void prologue() {
   lcd.clear();
   lcd.print("Game Start...");
+  digitalWrite(lED1, LOW);
   delay(1000);
+  digitalWrite(lED2, LOW);
+  digitalWrite(lED1, HIGH);
+  delay(1000);
+  digitalWrite(lED2, HIGH);
   lcd.clear();
 }
 
