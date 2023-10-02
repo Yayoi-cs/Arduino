@@ -38,6 +38,7 @@ int num3 = 0;
 int num4 = 0;
 int outsideCount;
 bool isguruguru;
+int score;
 
 void setup() {
   // put your setup code here, to run once:
@@ -60,38 +61,11 @@ void setup() {
 
 void loop() {
   int mil = millis();
-  if (mil % 300 == 0) {
-    if (isguruguru == true) {
-      digitalWrite(seg1Pin, LOW);
-      digitalWrite(seg2Pin, LOW);
-      digitalWrite(seg3Pin, HIGH);
-      digitalWrite(seg4Pin, HIGH);
-      guruguruprint(outsideCount % 6);
-      outsideCount++;
-    }
-  }
-  if (mil % 1000 == 0) {
-    if (isguruguru == true) {
-      tone(13, 440);
-      digitalWrite(1, HIGH);
-      delay(10);
-      noTone(13);
-      digitalWrite(1, LOW);
-    }
-  }
-  int score;
-  score = 0;
   while (Serial.available()) {
     char digit = Serial.read();
-    if(digit!='\n'){
-      score += digit - '0';
-      score = score * 10;
-    }
-    else{
-      break;
-    }
+    score += digit - '0';
+    score = score * 10;
   }
-  score = score / 10;
   if (score != 0) {
     Serial.println(score);
   }
@@ -101,50 +75,37 @@ void loop() {
     counter = counter / 10;
     keta++;
   }
-  if (score != 0) {
-    if (keta <= 2) {
-      Serial.println("yes");
-      num2 = score % 10;
-      num1 = (score / 10) % 10;
-      digitalWrite(seg1Pin, HIGH);
-      digitalWrite(seg2Pin, LOW);
-      digitalWrite(seg3Pin, LOW);
-      digitalWrite(seg4Pin, LOW);
-      numPrint(num1);
-      digitalWrite(seg1Pin, LOW);
-      digitalWrite(seg2Pin, HIGH);
-      digitalWrite(seg3Pin, LOW);
-      digitalWrite(seg4Pin, LOW);
-      numPrint(num2);
-      isguruguru = true;
-    } else {
-      isguruguru = false;
-      num4 = score % 10;
-      num3 = score / 10 % 10;
-      num2 = score / 100 % 10;
-      num1 = score / 1000 % 10;
-      digitalWrite(seg1Pin, HIGH);
-      digitalWrite(seg2Pin, LOW);
-      digitalWrite(seg3Pin, LOW);
-      digitalWrite(seg4Pin, LOW);
-      numPrint(1);
-      digitalWrite(seg1Pin, LOW);
-      digitalWrite(seg2Pin, HIGH);
-      digitalWrite(seg3Pin, LOW);
-      digitalWrite(seg4Pin, LOW);
-      numPrint(2);
-      digitalWrite(seg1Pin, LOW);
-      digitalWrite(seg2Pin, LOW);
-      digitalWrite(seg3Pin, HIGH);
-      digitalWrite(seg4Pin, LOW);
-      numPrint(3);
-      digitalWrite(seg1Pin, LOW);
-      digitalWrite(seg2Pin, LOW);
-      digitalWrite(seg3Pin, LOW);
-      digitalWrite(seg4Pin, HIGH);
-      numPrint(4);
-    }
-  }
+  //if (score != 0) {
+  isguruguru = false;
+  num4 = score % 10;
+  num3 = score / 10 % 10;
+  num2 = score / 100 % 10;
+  num1 = score / 1000 % 10;
+  digitalWrite(seg1Pin, HIGH);
+  digitalWrite(seg2Pin, LOW);
+  digitalWrite(seg3Pin, LOW);
+  digitalWrite(seg4Pin, LOW);
+  numPrint(num1);
+  delay(20);
+  digitalWrite(seg1Pin, LOW);
+  digitalWrite(seg2Pin, HIGH);
+  digitalWrite(seg3Pin, LOW);
+  digitalWrite(seg4Pin, LOW);
+  numPrint(num2);
+  delay(20);
+  digitalWrite(seg1Pin, LOW);
+  digitalWrite(seg2Pin, LOW);
+  digitalWrite(seg3Pin, HIGH);
+  digitalWrite(seg4Pin, LOW);
+  numPrint(num3);
+  delay(20);
+  digitalWrite(seg1Pin, LOW);
+  digitalWrite(seg2Pin, LOW);
+  digitalWrite(seg3Pin, LOW);
+  digitalWrite(seg4Pin, HIGH);
+  numPrint(num4);
+  delay(20);
+  //}
 }
 
 void guruguruprint(int num) {
