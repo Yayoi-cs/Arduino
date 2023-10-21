@@ -2,12 +2,11 @@
 
 //pin Value
 //LEDsettings
-const int lED1 = A2;   // @***@
-const int lED2 = A3;   // *@*@*
-const int lED3 = A4;   // **@**
-const int lED4 = A5;
-//const int lED5 = A5;
-//LED settings
+const int lED1 = A2;   // @*****@
+const int lED2 = A3;   // *@***@*
+const int lED3 = A4;   // **@*@**
+const int lED4 = A5;   // ***@***
+//LCD settings
 const int rS = 11;
 const int rW = 10;
 const int e = 9;
@@ -82,22 +81,30 @@ void (*resetFunc)(void) = 0;
 
 ISR(TIMER1_OVF_vect) {
         // タイマの割り込み処理
-        switch (timerCount % 3){
+        switch (timerCount % 4){
             case 0:
                 digitalWrite(lED1, HIGH);
-            digitalWrite(lED2, LOW);
-            digitalWrite(lED3, LOW);
-            break;
+                digitalWrite(lED2, LOW);
+                digitalWrite(lED3, LOW);
+                digitalWrite(lED4, LOW);
+                break;
             case 1:
                 digitalWrite(lED1, LOW);
-            digitalWrite(lED2, HIGH);
-            digitalWrite(lED3, LOW);
-            break;
+                digitalWrite(lED2, HIGH);
+                digitalWrite(lED3, LOW);
+                digitalWrite(lED4, LOW);
+                break;
             case 2:
                 digitalWrite(lED1, LOW);
-            digitalWrite(lED2, LOW);
-            digitalWrite(lED3, HIGH);
-            break;
+                digitalWrite(lED2, LOW);
+                digitalWrite(lED3, HIGH);
+                digitalWrite(lED4, LOW);
+                break;
+            case 3:
+                digitalWrite(lED1, LOW);
+                digitalWrite(lED2, LOW);
+                digitalWrite(lED3, LOW);
+                digitalWrite(lED4, HIGH);
         }
         timerCount++;
         Serial.println(millis());
