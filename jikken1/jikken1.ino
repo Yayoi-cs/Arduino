@@ -66,20 +66,19 @@ void setup() {
     TIMSK1 |= (1 << TOIE1); //TOIE -> 1 enable overflow
 }
 void displayNumber(int num) {
-    lcd.clear();
-    lcd.print(num);
-    lcd.setCursor(3, 0);
-    lcd.print("->");
+//    lcd.clear();
+//    lcd.print(num);
+//    lcd.setCursor(3, 0);
+//    lcd.print("->");
 
-    // numを1byte整数に丸め込む
-    uint8_t num_u8 = constrain(num, 0, 254);
-    // シリアル通信で送信
-    Serial.write(num_u8);
+    String myString = String(num);
+    Serial.write(myString.c_str());
 }
 
 void (*resetFunc)(void) = 0;
 
 ISR(TIMER1_OVF_vect) {
+    if(isStarted==false) return;
         // タイマの割り込み処理
         switch (timerCount % 4){
             case 0:
@@ -153,21 +152,19 @@ void gameFin() {
 }
 void loop() {
     // put your main code here, to run repeatedly:
-    if (digitalRead(buttonHigh) == LOW && digitalRead(buttonLow) == LOW && isStarted == false) {
+    if (digitalRead(buttonHigh) == HIGH && digitalRead(buttonLow) == HIGH && isStarted == false) {
         prologue();
         perNum = generateRand();
         displayNumber(perNum);
         isStarted = true;
     }
-    /*
-      if (digitalRead(buttonHigh) == LOW && digitalRead(buttonLow) == LOW && isStarted == true) {
+      if (digitalRead(buttonHigh) == HIGH && digitalRead(buttonLow) == HIGH && isStarted == true) {
       resetFunc();
       }
-    */
     if (isStarted == true) {
         int isHigh = digitalRead(buttonHigh);
         int isLow = digitalRead(buttonLow);
-        if (isHigh == 0) {
+        if (isHigh == 1) {
 
             lcd.print("high");
             int nextNum = generateRand();
@@ -186,7 +183,7 @@ void loop() {
             }
         }
 
-        if (isLow == 0) {
+        if (isLow == 1) {
             lcd.print("low");
             int nextNum = generateRand();
             if (nextNum < perNum) {

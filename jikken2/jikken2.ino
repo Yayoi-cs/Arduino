@@ -69,12 +69,11 @@ void setup() {
     digitalWrite(ePin, HIGH);
     digitalWrite(fPin, HIGH);
     digitalWrite(gPin, HIGH);
+    score=0;
 }
 
 ISR(TIMER1_OVF_vect) {
         outsideCount++;
-
-        //Serial.println("a");
         TCNT1 = 3036 + 65536 / 2;
 }
 
@@ -87,7 +86,6 @@ void loop() {
         score = score * 10;
         score += digit - '0';
     }
-    int counter = score;
     if (score >= 100) {
         isguruguru = false;
         num4 = score % 10;
@@ -153,7 +151,7 @@ void loop() {
 
 void guruguruprint(int num) {
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i <= 6; i++) {
         digitalWrite(pins[i], guruguru[num][i] ? LOW : HIGH);
     }
 }
