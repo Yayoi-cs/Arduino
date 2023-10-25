@@ -86,7 +86,7 @@ void loop() {
         score = score * 10;
         score += digit - '0';
     }
-    if (score >= 100) {
+    if (score >= 100 || score == 0) {
         isguruguru = false;
         num4 = score % 10;
         num3 = score / 10 % 10;

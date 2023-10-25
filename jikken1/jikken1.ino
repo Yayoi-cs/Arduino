@@ -18,7 +18,7 @@ const int dB4 = 4;
 const int buttonHigh = 13;
 const int buttonLow = 12;
 //
-const int isSounted = 3;
+bool isSounted;
 
 // Timer counter
 int timerCount = 0;
@@ -56,12 +56,12 @@ void setup() {
     digitalWrite(lED2, LOW);
     digitalWrite(lED3, LOW);
     digitalWrite(lED4, LOW);
-
+    isSounted=false;
     // Timer initilization
     TCCR1A = 0; // 初期化
     TCCR1B = 0; // 初期化
-    // 0.5秒ずつに割り込まれるように設定
-    TCNT1 = 3036 + 65536 / 2;
+    // 0.25秒ずつに割り込まれるように設定
+    TCNT1 = 3036 + 65536 / 4;
     TCCR1B = 0b00000100;
     TIMSK1 |= (1 << TOIE1); //TOIE -> 1 enable overflow
 }
@@ -80,35 +80,40 @@ void (*resetFunc)(void) = 0;
 ISR(TIMER1_OVF_vect) {
     if(isStarted==false) return;
         // タイマの割り込み処理
-        switch (timerCount % 4){
+        switch (timerCount % 8){
             case 0:
                 digitalWrite(lED1, HIGH);
                 digitalWrite(lED2, LOW);
                 digitalWrite(lED3, LOW);
                 digitalWrite(lED4, LOW);
                 break;
-            case 1:
+            case 2:
                 digitalWrite(lED1, LOW);
                 digitalWrite(lED2, HIGH);
                 digitalWrite(lED3, LOW);
                 digitalWrite(lED4, LOW);
                 break;
-            case 2:
+            case 4:
                 digitalWrite(lED1, LOW);
                 digitalWrite(lED2, LOW);
                 digitalWrite(lED3, HIGH);
                 digitalWrite(lED4, LOW);
                 break;
-            case 3:
+            case 6:
                 digitalWrite(lED1, LOW);
                 digitalWrite(lED2, LOW);
                 digitalWrite(lED3, LOW);
                 digitalWrite(lED4, HIGH);
+                tone(3,440);
+                isSounted = true;
+                break;
+            default:
+                isSounted=false;
+                noTone(3);
         }
         timerCount++;
         Serial.println(millis());
-
-        TCNT1 = 3036 + 65536 / 2;
+        TCNT1 = 3036 + 65536 / 4;
 }
 
 void prologue() {
@@ -132,7 +137,7 @@ int generateRand() {
 }
 
 void pointAdder() {
-    if (digitalRead(isSounted) == 1) {
+    if (isSounted) {
         score += 150;
     } else {
         score += 100;
