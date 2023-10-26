@@ -26,6 +26,7 @@ int timerCount = 0;
 bool isStarted;
 int score;
 int perNum;
+int perTimerCount;
 //LCDInstance
 LiquidCrystal lcd(rS, rW, e, dB4, dB5, dB6, dB7);
 void setup() {
@@ -57,11 +58,12 @@ void setup() {
     digitalWrite(lED3, LOW);
     digitalWrite(lED4, LOW);
     isSounted=false;
+    perTimerCount=0;
     // Timer initilization
     TCCR1A = 0; // 初期化
     TCCR1B = 0; // 初期化
     // 0.25秒ずつに割り込まれるように設定
-    TCNT1 = 3036 + 65536 / 4;
+    TCNT1 = 3036+((65536-3036)/4*3);
     TCCR1B = 0b00000100;
     TIMSK1 |= (1 << TOIE1); //TOIE -> 1 enable overflow
 }
@@ -86,18 +88,24 @@ ISR(TIMER1_OVF_vect) {
                 digitalWrite(lED2, LOW);
                 digitalWrite(lED3, LOW);
                 digitalWrite(lED4, LOW);
+                tone(3,480);
                 break;
             case 2:
                 digitalWrite(lED1, LOW);
                 digitalWrite(lED2, HIGH);
                 digitalWrite(lED3, LOW);
                 digitalWrite(lED4, LOW);
+                tone(3,440);
                 break;
             case 4:
                 digitalWrite(lED1, LOW);
                 digitalWrite(lED2, LOW);
                 digitalWrite(lED3, HIGH);
                 digitalWrite(lED4, LOW);
+                tone(3,440);
+                break;
+            case 5:
+                isSounted=true;
                 break;
             case 6:
                 digitalWrite(lED1, LOW);
@@ -105,7 +113,6 @@ ISR(TIMER1_OVF_vect) {
                 digitalWrite(lED3, LOW);
                 digitalWrite(lED4, HIGH);
                 tone(3,440);
-                isSounted = true;
                 break;
             default:
                 isSounted=false;
@@ -113,7 +120,7 @@ ISR(TIMER1_OVF_vect) {
         }
         timerCount++;
         Serial.println(millis());
-        TCNT1 = 3036 + 65536 / 4;
+        TCNT1 = 3036+((65536-3036)/4*3);
 }
 
 void prologue() {
@@ -137,8 +144,22 @@ int generateRand() {
 }
 
 void pointAdder() {
+    if(perTimerCount!=0 || timerCount-perTimerCount>8){
+        perTimerCount=timerCount;
+        score -= 50;
+        return;
+    }
     if (isSounted) {
-        score += 150;
+        int waveNow=TCNT1;
+        int currentpoint;
+        if(timerCount%8<=6){
+            //波長49911~65536
+            //waveNow>57723.5
+            score+=(((waveNow-57723.5)/150)+100)
+        }
+        else{
+            score+=(((waveNow-49911)/150)+100)
+        }
     } else {
         score += 100;
     }
