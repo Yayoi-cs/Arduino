@@ -2,11 +2,11 @@
 
 //pin Value
 //LEDsettings
-const int lED1 = A2;   // @*****@
-const int lED2 = A3;   // *@***@*
-const int lED3 = A4;   // **@*@**
-const int lED4 = A5;   // ***@***
-//LCD settings
+const int lED1 = A5;   // @*****@
+const int lED2 = A4;   // *@***@*
+const int lED3 = A3;   // **@*@**
+const int lED4 = A2;   // ***@***
+//LCD setting
 const int rS = 11;
 const int rW = 10;
 const int e = 9;
@@ -50,6 +50,8 @@ void setup() {
     lcd.begin(16, 2);
     lcd.clear();
     lcd.setCursor(0, 0);
+    //lcd.print("High and Low");
+    //でばっく
     lcd.print("High and Low");
     score = 0;
     isStarted = false;
@@ -80,46 +82,49 @@ void displayNumber(int num) {
 void (*resetFunc)(void) = 0;
 
 ISR(TIMER1_OVF_vect) {
-    if(isStarted==false) return;
+        if(isStarted==false){
+            noTone(3);
+            return;
+        }
         // タイマの割り込み処理
         switch (timerCount % 8){
             case 0:
                 digitalWrite(lED1, HIGH);
-                digitalWrite(lED2, LOW);
-                digitalWrite(lED3, LOW);
-                digitalWrite(lED4, LOW);
-                tone(3,480);
-                break;
+            digitalWrite(lED2, LOW);
+            digitalWrite(lED3, LOW);
+            digitalWrite(lED4, LOW);
+            tone(3,440, 150); // <= (3,440)
+            break;
             case 2:
                 digitalWrite(lED1, LOW);
-                digitalWrite(lED2, HIGH);
-                digitalWrite(lED3, LOW);
-                digitalWrite(lED4, LOW);
-                tone(3,440);
-                break;
+            digitalWrite(lED2, HIGH);
+            digitalWrite(lED3, LOW);
+            digitalWrite(lED4, LOW);
+            tone(3,440, 150); // <= (3,440)
+            break;
             case 4:
                 digitalWrite(lED1, LOW);
-                digitalWrite(lED2, LOW);
-                digitalWrite(lED3, HIGH);
-                digitalWrite(lED4, LOW);
-                tone(3,440);
-                break;
+            digitalWrite(lED2, LOW);
+            digitalWrite(lED3, HIGH);
+            digitalWrite(lED4, LOW);
+            tone(3,440, 150); // <= (3,440)
+            break;
             case 5:
-                isSounted=true;
-                break;
+                noTone(3);
+            isSounted=true;
+            break;
             case 6:
                 digitalWrite(lED1, LOW);
-                digitalWrite(lED2, LOW);
-                digitalWrite(lED3, LOW);
-                digitalWrite(lED4, HIGH);
-                tone(3,440);
-                break;
+            digitalWrite(lED2, LOW);
+            digitalWrite(lED3, LOW);
+            digitalWrite(lED4, HIGH);
+            tone(3,480, 200); // <= (3,480)
+            break;
             default:
                 isSounted=false;
-                noTone(3);
+            noTone(3);
         }
         timerCount++;
-        Serial.println(millis());
         TCNT1 = 3036+((65536-3036)/4*3);
 }
 
@@ -135,6 +140,8 @@ void prologue() {
     digitalWrite(lED4, HIGH);
     //delay(1000);
     lcd.clear();
+
+    score = 0;
 }
 
 int generateRand() {
@@ -144,22 +151,27 @@ int generateRand() {
 }
 
 void pointAdder() {
-    if(perTimerCount!=0 || timerCount-perTimerCount>8){
-        perTimerCount=timerCount;
-        score -= 50;
-        return;
-    }
+    /*
+      if(perTimerCount!=0 || timerCount-perTimerCount>8){
+          perTimerCount=timerCount;
+
+          return;
+      }
+      */
     if (isSounted) {
-        int waveNow=TCNT1;
-        int currentpoint;
-        if(timerCount%8<=6){
-            //波長49911~65536
-            //waveNow>57723.5
-            score+=(((waveNow-57723.5)/150)+100)
-        }
-        else{
-            score+=(((waveNow-49911)/150)+100)
-        }
+        /*
+          int waveNow=TCNT1;
+          int currentpoint;
+          if(timerCount%8<=6){
+              //波長49911~65536
+              //waveNow>57723.5
+              //score+=(((waveNow-57723.5)/150)+100);
+          }
+          else{
+              //score+=(((waveNow-49911)/150)+100);
+          }
+          */
+        score+=150;
     } else {
         score += 100;
     }
@@ -171,7 +183,10 @@ void gameFin() {
     lcd.setCursor(0, 0);
     lcd.print("Game Finish!");
     lcd.setCursor(0, 1);
-    lcd.print("check your score");
+    lcd.print("check your score"); //<= ("check your")
+    if(score != 0){ // <= score>0
+        score=0;
+    }
     String myString = String(score);
     Serial.write(myString.c_str());
     delay(5000);
@@ -184,9 +199,9 @@ void loop() {
         displayNumber(perNum);
         isStarted = true;
     }
-      if (digitalRead(buttonHigh) == HIGH && digitalRead(buttonLow) == HIGH && isStarted == true) {
-      resetFunc();
-      }
+    if (digitalRead(buttonHigh) == HIGH && digitalRead(buttonLow) == HIGH && isStarted == true) {
+        resetFunc();
+    }
     if (isStarted == true) {
         int isHigh = digitalRead(buttonHigh);
         int isLow = digitalRead(buttonLow);
@@ -204,8 +219,9 @@ void loop() {
                 delay(500);
             } else {
                 //gameOver
+                isStarted = false; // <=
                 gameFin();
-                isStarted = false;
+                // <=
             }
         }
 
@@ -223,7 +239,9 @@ void loop() {
             } else {
                 //gameOver
                 gameFin();
-                isStarted = false;
+                isStarted = false; // <=
+                gameFin();
+                // <=
             }
         }
     }

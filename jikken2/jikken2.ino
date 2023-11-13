@@ -39,6 +39,7 @@ int num4 = 0;
 int outsideCount;
 bool isguruguru;
 int score;
+bool writed;
 
 void setup() {
     // put your setup code here, to run once:
@@ -70,29 +71,35 @@ void setup() {
     digitalWrite(fPin, HIGH);
     digitalWrite(gPin, HIGH);
     score=0;
+    writed=false;
 }
 
 ISR(TIMER1_OVF_vect) {
         outsideCount++;
-        TCNT1 = 3036 + 65536 / 2;
+        TCNT1 = 3036 + 65536 / 4*3;
 }
 
 void loop() {
     int mil = millis();
     while (Serial.available()) {
+        if(writed==true){
+            writed=false;
+            score=0;
+        }
         char digit = Serial.read();
         if (digit == '\n') continue;
         //score += digit - '0';
         score = score * 10;
         score += digit - '0';
     }
+    Serial.println(score);
+    writed=true;
     if (score >= 100 || score == 0) {
         isguruguru = false;
         num4 = score % 10;
         num3 = score / 10 % 10;
         num2 = score / 100 % 10;
         num1 = score / 1000 % 10;
-        digitalWrite(seg1Pin, HIGH);
         digitalWrite(seg2Pin, LOW);
         digitalWrite(seg3Pin, LOW);
         digitalWrite(seg4Pin, LOW);
