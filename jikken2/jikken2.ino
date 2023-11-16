@@ -100,64 +100,34 @@ void loop() {
         num3 = score / 10 % 10;
         num2 = score / 100 % 10;
         num1 = score / 1000 % 10;
-        digitalWrite(seg2Pin, LOW);
-        digitalWrite(seg3Pin, LOW);
-        digitalWrite(seg4Pin, LOW);
-        numPrint(num1);
-        delay(5);
-        digitalWrite(seg1Pin, LOW);
-        digitalWrite(seg2Pin, HIGH);
-        digitalWrite(seg3Pin, LOW);
-        digitalWrite(seg4Pin, LOW);
-        numPrint(num2);
-        delay(5);
-        digitalWrite(seg1Pin, LOW);
-        digitalWrite(seg2Pin, LOW);
-        digitalWrite(seg3Pin, HIGH);
-        digitalWrite(seg4Pin, LOW);
-        numPrint(num3);
-        delay(5);
-        digitalWrite(seg1Pin, LOW);
-        digitalWrite(seg2Pin, LOW);
-        digitalWrite(seg3Pin, LOW);
-        digitalWrite(seg4Pin, HIGH);
-        numPrint(num4);
-        delay(5);
+        for(int i = 0;i < 4;i++){
+            digitalWrite(seg1Pin,(i==0)?HIGH:LOW);
+            digitalWrite(seg2Pin,(i==1)?HIGH:LOW);
+            digitalWrite(seg3Pin,(i==2)?HIGH:LOW);
+            digitalWrite(seg4Pin,(i==3)?HIGH:LOW);
+            numPrint((i==0)?num1:(i==1)?num2:(i==2)?num3:num4)
+            delay(5);
+        }
     }
     else {
         isguruguru = true;
         num2 = score % 10;
         num1 = score / 10 % 10;
-        digitalWrite(seg1Pin, HIGH);
-        digitalWrite(seg2Pin, LOW);
-        digitalWrite(seg3Pin, LOW);
-        digitalWrite(seg4Pin, LOW);
-        numPrint(num1);
-        delay(5);
-        digitalWrite(seg1Pin, LOW);
-        digitalWrite(seg2Pin, HIGH);
-        digitalWrite(seg3Pin, LOW);
-        digitalWrite(seg4Pin, LOW);
-        numPrint(num2);
-        delay(5);
-
-        digitalWrite(seg1Pin, LOW);
-        digitalWrite(seg2Pin, LOW);
-        digitalWrite(seg3Pin, HIGH);
-        digitalWrite(seg4Pin, LOW);
-        guruguruprint(outsideCount%6);
-        delay(5);
-        digitalWrite(seg1Pin, LOW);
-        digitalWrite(seg2Pin, LOW);
-        digitalWrite(seg3Pin, LOW);
-        digitalWrite(seg4Pin, HIGH);
-        guruguruprint(outsideCount%6);
-        delay(5);
+        for(int i = 0;i < 4;i++){
+            digitalWrite(seg1Pin,(i==0)?HIGH:LOW);
+            digitalWrite(seg2Pin,(i==1)?HIGH:LOW);
+            digitalWrite(seg3Pin,(i==2)?HIGH:LOW);
+            digitalWrite(seg4Pin,(i==3)?HIGH:LOW);
+            if(i<2)
+                numPrint((i==0)?num1:num2);
+            else
+                outsidePrint(outsideCount%6);
+            delay(5);
+        }
     }
 }
 
-void guruguruprint(int num) {
-
+void outsidePrint(int num) {
     for (int i = 0; i <= 6; i++) {
         digitalWrite(pins[i], guruguru[num][i] ? LOW : HIGH);
     }

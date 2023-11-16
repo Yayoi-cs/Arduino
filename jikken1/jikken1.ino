@@ -86,44 +86,16 @@ ISR(TIMER1_OVF_vect) {
             noTone(3);
             return;
         }
-        // タイマの割り込み処理
-        switch (timerCount % 8){
-            case 0:
-                digitalWrite(lED1, HIGH);
-            digitalWrite(lED2, LOW);
-            digitalWrite(lED3, LOW);
-            digitalWrite(lED4, LOW);
-            tone(3,440, 150); // <= (3,440)
-            break;
-            case 2:
-                digitalWrite(lED1, LOW);
-            digitalWrite(lED2, HIGH);
-            digitalWrite(lED3, LOW);
-            digitalWrite(lED4, LOW);
-            tone(3,440, 150); // <= (3,440)
-            break;
-            case 4:
-                digitalWrite(lED1, LOW);
-            digitalWrite(lED2, LOW);
-            digitalWrite(lED3, HIGH);
-            digitalWrite(lED4, LOW);
-            tone(3,440, 150); // <= (3,440)
-            break;
-            case 5:
-                noTone(3);
-            isSounted=true;
-            break;
-            case 6:
-                digitalWrite(lED1, LOW);
-            digitalWrite(lED2, LOW);
-            digitalWrite(lED3, LOW);
-            digitalWrite(lED4, HIGH);
-            tone(3,480, 200); // <= (3,480)
-            break;
-            default:
-                isSounted=false;
-            noTone(3);
-        }
+        digitalWrite(lED1,(timerCount%8==0)?HIGH:LOW);
+        digitalWrite(lED1,(timerCount%8==2)?HIGH:LOW);
+        digitalWrite(lED1,(timerCount%8==4)?HIGH:LOW);
+        digitalWrite(lED1,(timerCount%8==6)?HIGH:LOW);
+        if((timerCount%8)%2==0&&timerCount%8<=4)
+            tone(3,440);
+        else if(timerCount%8==6)
+            tone(3,480);
+        else
+            notone(3);
         timerCount++;
         TCNT1 = 3036+((65536-3036)/4*3);
 }
@@ -131,16 +103,10 @@ ISR(TIMER1_OVF_vect) {
 void prologue() {
     lcd.clear();
     lcd.print("Game Start...");
-    digitalWrite(lED1, HIGH);
-    delay(1000);
-    digitalWrite(lED2, HIGH);
-    delay(1000);
-    digitalWrite(lED3, HIGH);
-    delay(1000);
-    digitalWrite(lED4, HIGH);
-    //delay(1000);
-    lcd.clear();
-
+    for(int i = 0;i < 4;i++){
+        digitalWrite((i==0)?lED1:(i==1)?lED2:(i==2)?lED3:lED4,HIGH);
+        delay(1000)
+    }
     score = 0;
 }
 
@@ -151,26 +117,7 @@ int generateRand() {
 }
 
 void pointAdder() {
-    /*
-      if(perTimerCount!=0 || timerCount-perTimerCount>8){
-          perTimerCount=timerCount;
-
-          return;
-      }
-      */
     if (isSounted) {
-        /*
-          int waveNow=TCNT1;
-          int currentpoint;
-          if(timerCount%8<=6){
-              //波長49911~65536
-              //waveNow>57723.5
-              //score+=(((waveNow-57723.5)/150)+100);
-          }
-          else{
-              //score+=(((waveNow-49911)/150)+100);
-          }
-          */
         score+=150;
     } else {
         score += 100;
@@ -213,35 +160,30 @@ void loop() {
                 pointAdder();
                 lcd.setCursor(1, 1);
                 lcd.print("correct");
-                delay(1000);
                 perNum = nextNum;
                 displayNumber(perNum);
                 delay(500);
             } else {
                 //gameOver
-                isStarted = false; // <=
+                isStarted = false;
                 gameFin();
-                // <=
             }
         }
 
         if (isLow == 1) {
             lcd.print("low");
             int nextNum = generateRand();
-            if (nextNum < perNum) {
+            if (nextNum <= perNum) {
                 pointAdder();
                 lcd.setCursor(1, 1);
                 lcd.print("correct");
-                delay(1000);
                 perNum = nextNum;
                 displayNumber(perNum);
                 delay(500);
             } else {
-                //gameOver
                 gameFin();
-                isStarted = false; // <=
+                isStarted = false;
                 gameFin();
-                // <=
             }
         }
     }
